@@ -3700,9 +3700,9 @@ static int __init binder_init(void)
 
 static void __exit binder_exit(void)
 {
-	int ret;
+	int ret = 0;
 
-	ret = misc_deregister(&binder_miscdev);
+	misc_deregister(&binder_miscdev);
 	if (unlikely(ret))
 		pr_err("failed to unregister misc device!\n");
 

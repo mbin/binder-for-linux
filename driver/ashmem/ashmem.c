@@ -31,6 +31,7 @@
 #include <linux/bitops.h>
 #include <linux/mutex.h>
 #include <linux/shmem_fs.h>
+#include <linux/version.h>
 #include "ashmem.h"
 
 #define ASHMEM_NAME_PREFIX "dev/ashmem/"
@@ -372,8 +373,13 @@ static int ashmem_mmap(struct file *file, struct vm_area_struct *vma)
 	}
 
 	/* requested protection bits must match our allowed protection mask */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
 	if (unlikely((vma->vm_flags & ~calc_vm_prot_bits(asma->prot_mask)) &
 		     calc_vm_prot_bits(PROT_MASK))) {
+#else
+	if (unlikely((vma->vm_flags & ~calc_vm_prot_bits(asma->prot_mask, 0)) &
+		     calc_vm_prot_bits(PROT_MASK, 0))) {
+#endif
 		ret = -EPERM;
 		goto out;
 	}
@@ -863,11 +869,11 @@ static int __init ashmem_init(void)
 
 static void __exit ashmem_exit(void)
 {
-	int ret;
+	int ret = 0;
 
 	unregister_shrinker(&ashmem_shrinker);
 
-	ret = misc_deregister(&ashmem_misc);
+	misc_deregister(&ashmem_misc);
 	if (unlikely(ret))
 		pr_err("failed to unregister misc device!\n");
 

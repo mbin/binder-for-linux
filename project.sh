@@ -16,6 +16,15 @@ case ${cmd} in
         sh -c 'cd libs && make clean'
         sh -c 'cd test && make clean'
         ;; 
+    app)
+        sh -c 'cd servicemanager && make'
+        sh -c 'cd libs && make'
+        sh -c 'cd test && make'
+        ;; 
+    modules)
+        sh -c 'cd driver/binder && make'
+        sh -c 'cd driver/ashmem && make'
+        ;; 
     insmod)
         sh -c 'sudo insmod driver/binder/binder_linux.ko'
         sh -c 'sudo insmod driver/ashmem/ashmem_linux.ko'
